@@ -23,6 +23,10 @@ class _MediumTaskWithIsolateState extends State<MediumTaskWithIsolate> {
       result = "Computing...";
     });
 
+    if (progressStreamController.isClosed) {
+      progressStreamController = StreamController<double>();
+    }
+
     ReceivePort receivePort = ReceivePort();
     computationIsolate = await Isolate.spawn(
       heavyComputation,
@@ -31,13 +35,13 @@ class _MediumTaskWithIsolateState extends State<MediumTaskWithIsolate> {
 
     receivePort.listen((message) {
       if (message is double) {
-        progressStreamController.add(message);
+        progressStreamController.sink.add(message);
       } else if (message is int) {
         setState(() {
           result = "Computation Completed: $message";
           isComputing = false;
         });
-        progressStreamController.close();
+        progressStreamController.sink.close();
       }
     });
   }
@@ -78,12 +82,12 @@ class _MediumTaskWithIsolateState extends State<MediumTaskWithIsolate> {
             StreamBuilder<double>(
               stream: progressStreamController.stream,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data != null) {
                   return Column(
                     children: [
-                      LinearProgressIndicator(value: snapshot.data ?? 0 / 100),
+                      LinearProgressIndicator(value: snapshot.data! / 100),
                       const SizedBox(height: 10),
-                      Text("${snapshot.data?.toStringAsFixed(2)}% Completed"),
+                      Text("${snapshot.data!.toStringAsFixed(2)}% Completed"),
                     ],
                   );
                 } else {
