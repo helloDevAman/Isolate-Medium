@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'high/high_task_with_isolate.dart';
 import 'medium/medium_task_with_isolate.dart';
 import 'medium/medium_task_without_isolate.dart';
 import 'simple/simple_task_with_isolate.dart';
@@ -16,7 +17,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const MediumTaskWithoutIsolate(),
+      home: const HighTaskWithIsolate(),
     );
   }
 }
